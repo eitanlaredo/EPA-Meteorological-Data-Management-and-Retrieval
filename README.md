@@ -1,22 +1,76 @@
-README for EASY EPA: A meteorological file management and data retrieval system.
+# Easy EPA
 
+A command-line tool for retrieving, managing, and analyzing meteorological data from the U.S. Environmental Protection Agency.
 
-Easy EPA offers quick retrieval of csv files based on user input, along with easily accessible summarizations and plots via a menu selection.
+## Overview
 
+Easy EPA scrapes the [EPA Air Quality System](https://aqs.epa.gov/aqsweb/airdata/download_files.html) to download environmental datasets, then provides summaries, plots, and state-by-state comparisons through an interactive menu. Supports data going back to 1980.
 
-webscraper.py identifies downloadable zip files by parsing the HTML files on https://aqs.epa.gov/aqsweb/airdata/download_files.html. Relevant URLs are saved to your working directory in the text file "url_library.txt."
+## Features
 
+- **Daily Summaries** — Temperature, Wind, and AQI for any date and state
+- **Yearly Summaries** — Aggregate Temperature or AQI statistics by state and year
+- **Plotting** — Yearly trend plots for Temperature, AQI, and EPA criteria pollutant gases (Ozone, SO2, NO2, CO)
+- **State Comparisons** — Side-by-side plots comparing states for a given year
+- **File Management** — Download and cache EPA datasets locally as CSVs
 
-url_storage.py retrieves and unpacks zip files into csv_folder as csv files. csv_folder is generated for the user in the current working directory. These csv_files are sent to the backend analysis function for analysis and plotting.
+## Variables Supported
 
+| Variable | Period |
+|----------|--------|
+| Temperature | Daily |
+| Air Quality Index (AQI) | Daily |
+| Wind | Daily |
+| Ozone | Daily |
+| SO2 | Daily |
+| NO2 | Daily |
+| CO | Daily |
 
-backend_functions.py utilizes pandas and matplotlib to offer summarization and plotting of the data based on year, state, and input variable, dictated by the user via the frontend, Easy_EPA.py.
+## Project Structure
 
+```
+├── Easy_EPA.py            # Main CLI — menu-driven user interface
+├── backend_functions.py   # Data analysis, summaries, and plotting (Pandas, Matplotlib)
+├── epa_webscraper.py      # Scrapes EPA website for downloadable dataset URLs
+├── url_storage.py         # Manages URL index, downloads, and extracts zip → CSV
+├── input_validation.py    # Validates user inputs (dates, years, states)
+├── test_functions.ipynb   # Jupyter notebook with function tests and demonstrations
+└── csv_folder/            # Auto-generated local cache of downloaded CSVs
+```
 
-input_validation.py validates inputs generated from a user session in the front end
+## How It Works
 
+1. `epa_webscraper.py` parses the EPA downloads page using BeautifulSoup, extracting all available `.zip` file URLs into a local index
+2. `url_storage.py` maps those URLs to metadata (variable, year, period) and handles downloading/extracting into `csv_folder/`
+3. `backend_functions.py` reads the CSVs with Pandas and produces summaries and Matplotlib plots
+4. `Easy_EPA.py` ties it all together with a menu interface that guides the user through variable, year, and state selection
 
-Easy_EPA.py packages the module together via a menu selection service that allows the user to get quick summaries of data based on a meteorological variable, date, year, or state name.
+## Usage
 
+```bash
+python Easy_EPA.py
+```
 
-test_functions.jpynb uses jupyter notebooks to demonstrate validation of functions via testing with easy readability. 
+The menu will prompt you to select an action:
+
+- **D** — Daily summary (Temperature, Wind, AQI) for a specific date and state
+- **Y** — Yearly summary for Temperature or AQI by state
+- **P** — Plot Temperature, AQI, or criteria gases for a state and year
+- **C** — Compare states via plot
+- **S** — Download a specific dataset to `csv_folder/`
+- **Q** — Quit
+
+## Tools & Libraries
+
+- **Pandas** — data manipulation and aggregation
+- **Matplotlib** — visualization
+- **BeautifulSoup** — web scraping
+- **Requests** — HTTP requests with retry logic
+
+## Example Output
+
+```
+The AQI in Texas in 2022 was recorded for 45 Texas counties, and a total of
+365 days were recorded. The average AQI was 40.6 and the maximum recorded
+AQI was 194.0. (AQI's over 100 are considered unhealthy for sensitive groups.)
+```
